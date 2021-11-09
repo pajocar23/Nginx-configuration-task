@@ -1,0 +1,43 @@
+services:
+    db:
+        image: mariadb:10
+        container_name: wpdb
+        restart: always
+        volumes:
+            - 'db_data:/var/lib/mysql'
+        environment:
+            MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+            MYSQL_USER: wpuser
+            MYSQL_PASSWORD: wppassword
+            MYSQL_DATABASE: wp
+
+    phpmyadmin:
+        container_name: wpphpmyadmin
+        image: phpmyadmin/phpmyadmin:4.7
+        restart: always
+        depends_on: ['db']
+        depends_on: ['db:db']
+        ports: ['12000:80']
+        environment:
+            PMA_HOST: db
+            PMA_USER: wpuser
+            PMA_PASSWORD: wppassword
+
+    wordpress:
+        image: wordpress:5
+        container_name: wordpress-overridden
+        restart: always
+        depends_on: ['db']
+        links: ['db:db']
+        ports: ['8000:80']
+        volumes:
+            - './mounts/www:/var/www/html'
+        environment:
+            WORDPRESS_DB_HOST: db:3306
+            WORDPRESS_DB_USER: wpuser
+            WORDPRESS_DB_PASSWORD: wppassword
+            WORDPRESS_DB_NAME: wp 
+     
+
+volumes:
+    db_data: {}

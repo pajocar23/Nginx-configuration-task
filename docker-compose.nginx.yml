@@ -1,0 +1,13 @@
+services:
+
+    wordpress:
+        image: wordpress:5-fpm-alpine
+        container_name: wordpress-overridden
+        ports: ['9000:9000']
+            
+    nginx:
+        image: nginx:stable
+        container_name: nginx
+        ports: ['8001:80']
+        volumes:
+            - ./config/nginx:/etc/nginx/conf.d

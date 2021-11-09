@@ -1,0 +1,45 @@
+   example1:
+        depends_on:
+            - reverseproxy
+        image: example1:latest
+        restart: always
+ 
+    example2:
+        depends_on:
+            - reverseproxy
+        image: example2:latest
+        restart: always
+
+    example3:
+        depends_on:
+            - example2
+        image: example3:latest
+        restart: always
+
+
+         db:
+        image: mariadb:10
+        container_name: experiment-db
+        restart: always
+        volumes:
+            - db_data:/var/lib/mysql
+        environment:
+            MYSQL_DATABASE: "${MYSQL_DATABASE}"
+            MYSQL_USER: "${MYSQL_USER}"
+            MYSQL_PASSWORD: "${MYSQL_PASSWORD}"
+            MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+
+    wordpress-fpm:
+        image: wordpress:5-fpm-alpine
+        container_name: wordpress-nginx-experiment-wp-fpm
+        restart: always
+        links: ['db']
+        depends_on: ['db']
+        ports: ['9000:9000']
+        volumes:
+            - ./mounts/www:/var/www/html
+        environment:
+            WORDPRESS_DB_HOST: "${WORDPRESS_DB_HOST}"
+            WORDPRESS_DB_NAME: "${WORDPRESS_DB_NAME}"
+            WORDPRESS_DB_USER: "${WORDPRESS_DB_USER}"
+            WORDPRESS_DB_PASSWORD: "${WORDPRESS_DB_PASSWORD}"
